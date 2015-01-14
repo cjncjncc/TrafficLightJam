@@ -649,6 +649,10 @@ public class Algorithms
 	public static float Solve(TrafficGraph traffic, Map<String,int[]> flow, int time)
 	{
 		traffic.setCurrentFlow(flow);
-		return SolveSingle2(traffic,time);
+		for(int [] m:flow.values()){
+			traffic.Total+=Utils.ArraySum(m);
+		}
+		
+		return SolveSingle(traffic,time);
 	}
 }

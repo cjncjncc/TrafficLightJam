@@ -180,14 +180,14 @@ public class Main
 //		CrossFlow result=Algorithms.CalcCrossFlow(flowtest, test1);
 //		System.out.println(result.flowD2R);
 		selfTest(traffic,outfile);
-		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway);
+		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
 //		traffic.GraphToString();
 		System.out.println("begin");
 //		while(!"end".equalsIgnoreCase(flows_str))
 //		{
 //			//TODO  你的代码,注意，数据输出需保证一行输出，除了数据结果，请不要将任何无关数据或异常打印输出
 //			System.out.println(Process(flows_str,time,traffic));
-//	        //获取下一个时间段的流量
+//	        //获取下一个时间段的流量、、、
 //			flows_str = br.readLine();
 //			time++;
 //		}
