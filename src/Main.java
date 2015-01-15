@@ -180,14 +180,14 @@ public class Main
 //		CrossFlow result=Algorithms.CalcCrossFlow(flowtest, test1);
 //		System.out.println(result.flowD2R);
 		selfTest(traffic,outfile);
-		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway);
+		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
 //		traffic.GraphToString();
-		System.out.println("begin");
+		System.out.println("begin"+"happy");
 //		while(!"end".equalsIgnoreCase(flows_str))
 //		{
 //			//TODO  浣犵殑浠ｇ爜,娉ㄦ剰锛屾暟鎹緭鍑洪渶淇濊瘉涓�琛岃緭鍑猴紝闄や簡鏁版嵁缁撴灉锛岃涓嶈灏嗕换浣曟棤鍏虫暟鎹垨寮傚父鎵撳嵃杈撳嚭
 //			System.out.println(Process(flows_str,time,traffic));
-
+//	        //鑾峰彇涓嬩竴涓椂闂存鐨勬祦閲忋�併�併��
 //			flows_str = br.readLine();
 //			time++;
 //		}

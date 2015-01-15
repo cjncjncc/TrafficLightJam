@@ -19,12 +19,14 @@ public class TrafficGraph
 	public int penalty;
 	public int TimeoutTimes;
 	public int flowAway;
+	public int Total;
 	TrafficGraph()
 	{
 		this.crosses = new HashMap<String,TrafficCrossroad>();
 		penalty=0;
 		TimeoutTimes=0;
 		flowAway=0;
+		Total=0;
 	}
 	
 	
@@ -436,6 +438,147 @@ public class TrafficGraph
 					}
 					else if (setting2==1)
 					{
+						downcf.flowL2U = 0;
+						downcf.flowL2R = 0;
+						downcf.flowR2L = 0;
+						downcf.flowR2D = 0;
+					}
+					f[3] += downcf.flowU2D+downcf.flowR2D+downcf.flowL2D +flowAdd.get(cross.id)[3]/2;
+				}else{
+					f[3] += flowAdd.get(cross.id)[3];
+				}
+			}
+
+			flow.put(cross.id, f);
+			
+		}
+		
+		return flow;
+	}
+	public Map<String,int[]> computeNextFlow2(int time)
+	{
+		Map<String,int[]> flow = new HashMap<String,int []>();
+		flow = this.getFlow(time);
+		Map<String,int[]> flowAdd=this.getFlowAddAll(time+1);
+		for(TrafficCrossroad cross : this.crosses.values())
+		{
+			String cid = cross.id;
+			int setting = cross.lightSettingHistory[time];
+			
+			CrossFlow cf = Algorithms.CalcCrossFlow(cross.flowHistory.get(time),cross);
+			if ( setting!=3)
+			{
+				cf.flowD2L = 0;
+				cf.flowD2U = 0;
+				cf.flowU2D = 0;
+				cf.flowU2R = 0;
+				cf.flowL2U = 0;
+				cf.flowL2R = 0;
+				cf.flowR2L = 0;
+				cf.flowR2D = 0;
+			}
+			
+			
+			int[] f = flow.get(cid);
+			f[0] -= cf.flowL2D+cf.flowL2R+cf.flowL2U;
+			f[1] -= cf.flowU2D+cf.flowU2L+cf.flowU2R;
+			f[2] -= cf.flowR2D+cf.flowR2L+cf.flowR2U;
+			f[3] -= cf.flowD2L+cf.flowD2R+cf.flowD2U;
+			this.flowAway+=cf.flowD2L+cf.flowD2R+cf.flowD2U+cf.flowR2D+cf.flowR2L+cf.flowR2U+cf.flowU2D+cf.flowU2L+cf.flowU2R+cf.flowL2D+cf.flowL2R+cf.flowL2U;
+			for(int i=0;i<4;i++){
+				if(f[i]<0){
+					f[i]=0;
+				}
+			}
+			this.penalty+=Utils.ArraySum(f);
+	
+			
+			if ( cross.neighbours[0].compareTo(Constants.LIGHT_NONE)!=0)
+			{
+				if(this.crosses.get(cross.neighbours[0])!=null){
+					TrafficCrossroad LeftCross =this.crosses.get(cross.neighbours[0]);
+					CrossFlow lcf = Algorithms.CalcCrossFlow(LeftCross.flowHistory.get(time),LeftCross);
+					
+					int setting2 = LeftCross.lightSettingHistory[time];
+					if ( setting2!=3)
+					{
+						lcf.flowD2L = 0;
+						lcf.flowD2U = 0;
+						lcf.flowU2D = 0;
+						lcf.flowU2R = 0;
+
+						lcf.flowL2U = 0;
+						lcf.flowL2R = 0;
+						lcf.flowR2L = 0;
+						lcf.flowR2D = 0;
+					}
+				
+					f[0] += lcf.flowD2R+lcf.flowL2R+lcf.flowU2R + flowAdd.get(cross.id)[0]/2;
+				}else{
+					f[0] += flowAdd.get(cross.id)[0];
+				}
+			}
+			
+			if ( cross.neighbours[1].compareTo(Constants.LIGHT_NONE)!=0)
+			{
+				if(this.crosses.get(cross.neighbours[1])!=null){
+					TrafficCrossroad upCross =this.crosses.get(cross.neighbours[1]);
+					CrossFlow upcf = Algorithms.CalcCrossFlow(upCross.flowHistory.get(time),upCross);
+					int setting2 = upCross.lightSettingHistory[time];
+					if ( setting2!=3)
+					{
+						upcf.flowD2L = 0;
+						upcf.flowD2U = 0;
+						upcf.flowU2D = 0;
+						upcf.flowU2R = 0;
+
+						upcf.flowL2U = 0;
+						upcf.flowL2R = 0;
+						upcf.flowR2L = 0;
+						upcf.flowR2D = 0;
+					}
+				
+					f[1] += upcf.flowL2D+upcf.flowU2D+upcf.flowR2D + flowAdd.get(cross.id)[1]/2;
+				}else{
+					f[1] += flowAdd.get(cross.id)[1];
+				}
+			}
+			
+			if ( cross.neighbours[2].compareTo(Constants.LIGHT_NONE)!=0)
+			{
+				if(this.crosses.get(cross.neighbours[2])!=null){
+					TrafficCrossroad RightCross =this.crosses.get(cross.neighbours[2]);
+					CrossFlow rightcf = Algorithms.CalcCrossFlow(RightCross.flowHistory.get(time),RightCross);
+					int setting2 = RightCross.lightSettingHistory[time];
+					if ( setting2!=0)
+					{
+						rightcf.flowD2L = 0;
+						rightcf.flowD2U = 0;
+						rightcf.flowU2D = 0;
+						rightcf.flowU2R = 0;
+
+						rightcf.flowL2U = 0;
+						rightcf.flowL2R = 0;
+						rightcf.flowR2L = 0;
+						rightcf.flowR2D = 0;
+					}
+					f[2] += rightcf.flowU2L+rightcf.flowR2L+rightcf.flowD2L + flowAdd.get(cross.id)[2]/2;
+				}else{
+					f[2] += flowAdd.get(cross.id)[2];
+				}
+			}
+			if ( cross.neighbours[3].compareTo(Constants.LIGHT_NONE)!=0)
+			{
+				if(this.crosses.get(cross.neighbours[3])!=null){
+					TrafficCrossroad DownCross =this.crosses.get(cross.neighbours[3]);
+					CrossFlow downcf = Algorithms.CalcCrossFlow(DownCross.flowHistory.get(time),DownCross);
+					int setting2 = DownCross.lightSettingHistory[time];
+					if ( setting2!=0)
+					{
+						downcf.flowD2L = 0;
+						downcf.flowD2U = 0;
+						downcf.flowU2D = 0;
+						downcf.flowU2R = 0;
 						downcf.flowL2U = 0;
 						downcf.flowL2R = 0;
 						downcf.flowR2L = 0;
