@@ -44,4 +44,9 @@ public class TrafficCrossroad
 	{
 		this.lightSettingHistory[time] = setting;
 	}
+	
+	public int findOtherSide(int i){
+		int j=0;
+		return j;
+	}
 }
