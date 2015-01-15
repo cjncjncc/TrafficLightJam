@@ -9,11 +9,11 @@ import java.util.Map;
 public class Main 
 {
 	/***
-	 * 将输入的字符串转换为流量map
+	 * 灏嗚緭鍏ョ殑瀛楃涓茶浆鎹负娴侀噺map
 	 * 
-	 * @param traffic - 交通结构图
-	 * @param line - 输出字符串
-	 * @return 流量map
+	 * @param traffic - 浜ら�氱粨鏋勫浘
+	 * @param line - 杈撳嚭瀛楃涓�
+	 * @return 娴侀噺map
 	 */
 	public static Map<String,int[]> String2Flow(TrafficGraph traffic, String line)
 	{
@@ -48,11 +48,11 @@ public class Main
 	}
 	
 	/***
-	 * 将路口的红绿灯状态转换为字符串
+	 * 灏嗚矾鍙ｇ殑绾㈢豢鐏姸鎬佽浆鎹负瀛楃涓�
 	 * 
-	 * @param traffic - 交通结构图
-	 * @param time - 当前时间
-	 * @return 字符串
+	 * @param traffic - 浜ら�氱粨鏋勫浘
+	 * @param time - 褰撳墠鏃堕棿
+	 * @return 瀛楃涓�
 	 */
 	public static String OutputLightSetting(TrafficGraph traffic, int time)
 	{
@@ -67,7 +67,7 @@ public class Main
 			
 			int[] status = new int[12];
 			if ( setting == 0)
-			{//水平方向
+			{//姘村钩鏂瑰悜
 				status[0] = 1;
 				status[1] = 1;
 				status[2] = 1;
@@ -82,7 +82,7 @@ public class Main
 				status[11] = 0;
 			}
 			else
-			{//垂直方向
+			{//鍨傜洿鏂瑰悜
 				status[0] = 0;
 				status[1] = 1;
 				status[2] = 0;
@@ -160,9 +160,9 @@ public class Main
 				Main.class.getResourceAsStream(Constants.FILENAME_TRAFFIC)));
 		BufferedReader readerFlow = new BufferedReader( new InputStreamReader(
 				Main.class.getResourceAsStream(Constants.FILENAME_FLOW_ADD)));
-		//读入红绿灯的结构图
+		//璇诲叆绾㈢豢鐏殑缁撴瀯鍥�
 		traffic.load(reader);
-		//读入每个时刻突然出现的流量
+		//璇诲叆姣忎釜鏃跺埢绐佺劧鍑虹幇鐨勬祦閲�
 		traffic.loadFlowAdd(readerFlow);
 		reader.close();
 		readerFlow.close();
@@ -182,17 +182,17 @@ public class Main
 		selfTest(traffic,outfile);
 		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
 //		traffic.GraphToString();
-		System.out.println("begin");
+		System.out.println("begin"+"happy");
 //		while(!"end".equalsIgnoreCase(flows_str))
 //		{
-//			//TODO  你的代码,注意，数据输出需保证一行输出，除了数据结果，请不要将任何无关数据或异常打印输出
+//			//TODO  浣犵殑浠ｇ爜,娉ㄦ剰锛屾暟鎹緭鍑洪渶淇濊瘉涓�琛岃緭鍑猴紝闄や簡鏁版嵁缁撴灉锛岃涓嶈灏嗕换浣曟棤鍏虫暟鎹垨寮傚父鎵撳嵃杈撳嚭
 //			System.out.println(Process(flows_str,time,traffic));
-//	        //获取下一个时间段的流量、、、
+//	        //鑾峰彇涓嬩竴涓椂闂存鐨勬祦閲忋�併�併��
 //			flows_str = br.readLine();
 //			time++;
 //		}
 		
 		
-		//自我测试部分代码
+		//鑷垜娴嬭瘯閮ㄥ垎浠ｇ爜
 	}
 }
