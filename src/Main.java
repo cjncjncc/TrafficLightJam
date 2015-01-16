@@ -6,6 +6,8 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.rmi.CORBA.Util;
+
 public class Main 
 {
 	/***
@@ -144,7 +146,7 @@ public class Main
 			outputwriter.append("\n");
 //			outfile.write();
 			if(i+1<Constants.MAX_TIME-1){
-				initFlow=traffic.computeNextFlow(i);
+				initFlow=traffic.computeNextFlow2(i);
 			}
 		}
 		outputwriter.flush();
@@ -179,19 +181,29 @@ public class Main
 //		}
 //		CrossFlow result=Algorithms.CalcCrossFlow(flowtest, test1);
 //		System.out.println(result.flowD2R);
-//		selfTest(traffic,outfile);
-//		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
+		selfTest(traffic,outfile);
+		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
 		int thiscount=0;
+		String outFlight="";
+//		for(TrafficCrossroad cross:traffic.crosses.values()){
+//			for(String j:cross.neighbours){
+//				if(!traffic.crosses.containsKey(j)){
+//					if(j.compareTo(Constants.LIGHT_NONE)!=0){
+//						outFlight+="\""+j+"\",";
+//					}
+//				}
+//			}
+//		}
 		for(TrafficCrossroad cross:traffic.crosses.values()){
-			for(String j:cross.neighbours){
-				if(!traffic.crosses.containsKey(j)){
-					if(j.compareTo(Constants.LIGHT_NONE)!=0){
-						thiscount++;
+			for(int i=0;i<4;i++){
+				if (traffic.outLightslist.contains(cross.neighbours[i])){
+					for(int j=0;j<cross.flowAdd.length;j++){
+						thiscount+=Utils.ArraySum(cross.flowAdd[j]);
 					}
 				}
 			}
 		}
-		System.out.println("begin:"+thiscount);
+		System.out.println(thiscount);
 //		while(!"end".equalsIgnoreCase(flows_str))
 //		{
 //			//TODO  浣犵殑浠ｇ爜,娉ㄦ剰锛屾暟鎹緭鍑洪渶淇濊瘉涓�琛岃緭鍑猴紝闄や簡鏁版嵁缁撴灉锛岃涓嶈灏嗕换浣曟棤鍏虫暟鎹垨寮傚父鎵撳嵃杈撳嚭

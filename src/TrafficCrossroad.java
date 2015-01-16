@@ -47,6 +47,7 @@ public class TrafficCrossroad
 	
 	public int findOtherSide(int i){
 		int j=0;
+		j=(i+2)%4;
 		return j;
 	}
 }

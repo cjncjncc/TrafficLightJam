@@ -653,6 +653,6 @@ public class Algorithms
 			traffic.Total+=Utils.ArraySum(m);
 		}
 		
-		return SolveSingle(traffic,time);
+		return SolveSingle2(traffic,time);
 	}
 }
