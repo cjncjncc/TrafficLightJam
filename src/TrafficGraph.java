@@ -20,6 +20,7 @@ public class TrafficGraph
 	public int TimeoutTimes;
 	public int flowAway;
 	public int Total;
+	public List<String> Flowout;
 	TrafficGraph()
 	{
 		this.crosses = new HashMap<String,TrafficCrossroad>();
@@ -27,6 +28,7 @@ public class TrafficGraph
 		TimeoutTimes=0;
 		flowAway=0;
 		Total=0;
+		Flowout= new ArrayList<String>();
 	}
 	
 	
@@ -285,15 +287,16 @@ public class TrafficGraph
 	public int findNeighbourIndex(String dstId, String frmId)
 	{
 		TrafficCrossroad cr = this.crosses.get(dstId);
-		for(int i=0;i<4;i++)
-		{
-			if ( cr.neighbours[i].compareTo(frmId)==0)
+		if(cr!=null){
+			for(int i=0;i<4;i++)
 			{
-				return i;
+				if ( cr.neighbours[i].compareTo(frmId)==0)
+				{
+					return i;
+				}
 			}
 		}
-		
-		return -1;
+		return 0;
 	}
 	
 	/***

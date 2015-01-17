@@ -601,19 +601,13 @@ public class Algorithms
 	 */
 	public static float SolveSingle2(TrafficGraph traffic, int time)
 	{
-		//估计交通图中每条边的权值
-		Map<String,float[]> estimateCost = FlowPropagate(traffic,time,
-				Constants.ESTIMATE_INTERVAL);
-		
-		//将权值缩小一定比例
-		FlowScale(estimateCost,Constants.LAMBDA_1);
-		
-		//u
+
 		Map<String,float[]> cost = traffic.getCurrentFlow();
 		Map<String,Integer> setting = new HashMap<String,Integer>();
 		for(Map.Entry<String, float[]> entry:cost.entrySet()){
 			int thisset=0;
 			float flow[]=entry.getValue();
+			String crossid=entry.getKey();
 			for(int i=0;i<4;i++){
 				flow[i]=Math.min(20, flow[i]);
 			}
@@ -638,6 +632,277 @@ public class Algorithms
 		
 		traffic.saveCurrentFlow();
 		return tcost;
+		
+	}
+	
+	/***
+	 * 
+	 * @param traffic
+	 * @param time
+	 * @return
+	 */
+	public static int SolveSingle3Single(TrafficGraph traffic,TrafficCrossroad Cross,float []flow,Map<String,Integer> setting,int time)
+	{
+				//u
+				int set=0;
+				Map<String,float[]> cost = traffic.getCurrentFlow();
+				String [] crossneighber=Cross.neighbours;
+				int neiberAfterFlowState[]=new int[4];
+				int neiberAfterFlowNeed[]=new int[4];
+				int thisCanfullNeed[]=new int[4];
+				int NeiberNewIn[]=new int[4];
+				int neibersetting[]= new int[4];
+				//对最大流量限制
+				for(int i=0;i<4;i++){
+					flow[i]=Math.min(20, flow[i]);
+				}
+				//获得邻居的当前红绿灯设置
+				for(int i=0;i<4;i++){
+					if(crossneighber[i].compareTo(Constants.LIGHT_NONE)!=0){
+						if(setting.containsKey(crossneighber[i])){
+							neibersetting[i]=setting.get(crossneighber[i]);
+						}else{
+							neibersetting[i] = 10;//没有设置设置成10
+						}
+					}else{
+						neibersetting[i] = 9;//空的状态为9
+					}
+				}
+				//获得邻居节点流动后的状态
+				for(int i=0;i<4;i++){
+					float [] neiberFlow = new float[4] ;
+					if(cost.containsKey(crossneighber[i])){
+						neiberFlow = cost.get(crossneighber[i]);
+					}else{
+						for(int j=0;j<4;j++){
+							neiberFlow[j]=0;
+						}
+					}//邻居的Flow状态
+					if(neibersetting[i]<9){
+						
+						int fromID=traffic.findNeighbourIndex(crossneighber[i], Cross.id);
+						if(neibersetting[i]==0){
+							if(fromID==0||fromID==2){
+								neiberAfterFlowState[i] = (int) (neiberFlow[fromID] - Math.min(20, neiberFlow[fromID]));
+							}else{
+								neiberAfterFlowState[i] = (int) neiberFlow[fromID];
+							}
+						}else if(neibersetting[i]==1){
+							if(fromID==0||fromID==2){
+								neiberAfterFlowState[i] = (int) neiberFlow[fromID];
+							}else{
+								neiberAfterFlowState[i] = (int) (neiberFlow[fromID] - Math.min(20, neiberFlow[fromID]));
+							}
+						}else{
+							int rightID=traffic.crosses.get(crossneighber[i]).findTriRight();
+							if(rightID ==fromID){
+								neiberAfterFlowState[i] = (int) neiberFlow[fromID];
+							}else if((fromID-rightID)%4==2){
+								neiberAfterFlowState[i] = (int) (neiberFlow[fromID] - Math.min(20, neiberFlow[fromID]));
+							}else{
+								neiberAfterFlowState[i] = (int) (neiberFlow[fromID] - Math.min(4, neiberFlow[fromID]));
+							}
+						}
+					}else{
+						if(neibersetting[i]==9){
+							neiberAfterFlowState[i] = 0;
+						}else{//设置成10，不为空，但是没有设置
+							int fromID=traffic.findNeighbourIndex(crossneighber[i], Cross.id);
+							neiberAfterFlowState[i]=(int) neiberFlow[fromID];
+						}
+					}
+				}
+				//获得预估加入的量
+				for(int i=0;i<4;i++){
+					if(crossneighber[i].compareTo(Constants.LIGHT_NONE)==0){
+						NeiberNewIn[i]=0;
+					}else{
+						if(traffic.crosses.containsKey(crossneighber[i])){
+							int fromID=traffic.findNeighbourIndex(crossneighber[i], Cross.id);
+							NeiberNewIn[i] = traffic.crosses.get(crossneighber[i]).flowAdd[time+1][fromID]/2;//有可能报错
+						}else {
+							NeiberNewIn[i]=0;
+						}
+						
+					}
+				}
+				//获得需求量
+				for(int i=0;i<4;i++){
+					if(traffic.crosses.containsKey(crossneighber[i])){
+						int fromID=traffic.findNeighbourIndex(crossneighber[i], Cross.id);
+						if(IsTriangle(traffic.crosses.get(crossneighber[i]))){
+							int right = traffic.crosses.get(crossneighber[i]).findTriRight();
+							if((fromID-right)%4==3){
+								neiberAfterFlowNeed[i] = Math.max(0,4- (neiberAfterFlowState[i]+NeiberNewIn[i]));
+							}else{
+								neiberAfterFlowNeed[i] = Math.max(0,20- (neiberAfterFlowState[i]+NeiberNewIn[i]));
+							}
+						}else{
+							neiberAfterFlowNeed[i] = Math.max(0,20- (neiberAfterFlowState[i]+NeiberNewIn[i]));
+						}
+					}else if(crossneighber[i].compareTo(Constants.LIGHT_NONE)==0){
+						neiberAfterFlowNeed[i]=0;
+					}else{
+						neiberAfterFlowNeed[i]=999;
+					}
+				}
+				
+				//更新可满足量
+				for(int i=0;i<4;i++){
+					thisCanfullNeed[i]=(int) Math.min(neiberAfterFlowNeed[i], flow[i]);
+				}
+				//再次更新需求量
+				for(int i=0;i<4;i++){
+					if(traffic.crosses.containsKey(crossneighber[i])&&traffic.crosses.get(crossneighber[i]).findHighestLevel()==10){
+						thisCanfullNeed[i] = 0;
+					}
+					if(Cross.neighboursLevel[i]==10){
+						thisCanfullNeed[i] = 0;
+					}
+				}
+				//决定set
+				boolean onMainRoad=false;
+				for(int i=0;i<4;i++){
+					if(Cross.neighboursLevel[i]<10){
+						 onMainRoad=true;
+					}
+				}
+				if(IsTriangle(Cross)){
+					//更新计算可流动的最大量
+					int RightID=Cross.findTriRight();
+					for(int i=0;i<4;i++){
+						if((RightID-i)%4==1){
+							flow[i]=Math.min(4, flow[i]);
+						}
+					}
+					if(onMainRoad){
+						if((thisCanfullNeed[0]+thisCanfullNeed[2])>(thisCanfullNeed[1]+thisCanfullNeed[3])){
+							set=0;
+						}else{
+							set=1;
+						}
+					}else{
+						if((flow[0]+flow[2])>(flow[1]+flow[3])){
+							set=0;
+						}else{
+							set=1;
+						}
+					}
+				}else{
+					
+					if(onMainRoad){
+						if((thisCanfullNeed[0]+thisCanfullNeed[2])>(thisCanfullNeed[1]+thisCanfullNeed[3])){
+							set=0;
+						}else{
+							set=1;
+						}
+					}else{
+						if((flow[0]+flow[2])>(flow[1]+flow[3])){
+							set=0;
+						}else{
+							set=1;
+						}
+					}
+				}
+				return set;
+	}
+	public static int SolveSingle4Single(TrafficGraph traffic,TrafficCrossroad Cross,float []flow,Map<String,Integer> setting,int time)
+	{
+				//u
+				int set=0;
+				Map<String,float[]> cost = traffic.getCurrentFlow();
+				String [] crossneighber=Cross.neighbours;
+				int neiberFlowState[]=new int[4];
+				float delta =1f;
+				float Score[]=new float[4];
+				//对最大流量限制
+				for(int i=0;i<4;i++){
+					flow[i]=Math.min(20, flow[i]);
+					Score[i]+=flow[i];
+				}
+				
+				for(int i=0;i<4;i++){
+					if(crossneighber[i].compareTo(Constants.LIGHT_NONE)==0){
+						neiberFlowState[i]=18;
+					}else{
+						if(traffic.crosses.containsKey(crossneighber[i])){
+							float []neiberFLow = cost.get(crossneighber[i]);
+							int fromID=traffic.findNeighbourIndex(crossneighber[i], Cross.id);
+							neiberFlowState[i]=(int) neiberFLow[fromID];
+						}else{
+							neiberFlowState[i]=0;
+						}
+					}
+				}
+				for(int i=0;i<4;i++){
+					int othersid = (i+2)%4;
+					Score[i]+=Math.max(0,(20-neiberFlowState[othersid])*delta);
+				}
+				if((Score[0]+Score[2])>(Score[1]+Score[3])){
+					set=0;
+				}else{
+					set=1;
+				}
+				if ( IsMaxInterval(Cross.id,time,set,traffic))
+				{
+					traffic.TimeoutTimes++;
+					set = 1-set;
+				}
+				return set;
+	}
+	public static float SolveSingle3(TrafficGraph traffic, int time){
+		float ret=0f;
+		Map<String,Integer> setting = new HashMap<String,Integer>();
+		Map<String,float[]> cost = traffic.getCurrentFlow();
+		for(int i=1;i<11;i++){
+			for(TrafficCrossroad cross:traffic.crosses.values()){
+				if(cross.findHighestLevel()==i){
+					String ID=cross.id;
+					int set = 0;
+					float [] flow=cost.get(cross.id);
+					set=SolveSingle3Single(traffic,cross,flow,setting,time);
+					setting.put(cross.id, set);
+				}
+			}
+		}
+		traffic.setLight(setting, time);
+		
+		traffic.saveCurrentFlow();
+		return ret;
+	}
+	public static float SolveSingle4(TrafficGraph traffic, int time){
+		float ret=0f;
+		Map<String,Integer> setting = new HashMap<String,Integer>();
+		Map<String,float[]> cost = traffic.getCurrentFlow();
+		for(TrafficCrossroad cross:traffic.crosses.values()){
+					String ID=cross.id;
+					int set = 0;
+					float [] flow=cost.get(cross.id);
+					set=SolveSingle4Single(traffic,cross,flow,setting,time);
+					setting.put(ID, set);
+		}
+		traffic.setLight(setting, time);
+		
+		traffic.saveCurrentFlow();
+		return ret;
+	}
+	public static int [] Set3CanGo(TrafficCrossroad Cross,int []flow){
+		int ret[]=new int[4];
+		int right=Cross.findTriRight();
+		ret[right]=0;
+		int NoneOther=(right+3)%4;
+		ret[NoneOther]=Math.min(flow[NoneOther], 4);
+		return ret;
+	}
+	
+	public static boolean IsTriangle(TrafficCrossroad Cross){
+		boolean IsTri=false;
+		for(String i:Cross.neighbours){
+			if(i.compareTo(Constants.LIGHT_NONE)==0){
+				IsTri=true;
+			}
+		}
+		return IsTri;
 	}
 	/***
 	 * 
@@ -653,6 +918,6 @@ public class Algorithms
 			traffic.Total+=Utils.ArraySum(m);
 		}
 		
-		return SolveSingle(traffic,time);
+		return SolveSingle4(traffic,time);
 	}
 }

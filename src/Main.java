@@ -155,52 +155,69 @@ public class Main
 	{
 		//initialize
 		TrafficGraph traffic = new TrafficGraph();
-		FileOutputStream outfile = new FileOutputStream(Constants.FILENAME_OUTPUT);
+
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				Main.class.getResourceAsStream(Constants.FILENAME_TRAFFIC)));
 		BufferedReader readerFlow = new BufferedReader( new InputStreamReader(
 				Main.class.getResourceAsStream(Constants.FILENAME_FLOW_ADD)));
 		//璇诲叆绾㈢豢鐏殑缁撴瀯鍥�
 		traffic.load(reader);
+		
 		//璇诲叆姣忎釜鏃跺埢绐佺劧鍑虹幇鐨勬祦閲�
 		traffic.loadFlowAdd(readerFlow);
 		reader.close();
 		readerFlow.close();
 		
-		//main process
-//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//		String flows_str = br.readLine();
-		int time=0;
-//		TrafficCrossroad test1=new TrafficCrossroad("test1");
-//		test1.setNeightbours("t1", "t2", "t3", "t4");
-//		int []flowtest= new int[4];
-//		for(int i=0;i<4;i++){
-//			flowtest[i]=20;
-//		}
-//		CrossFlow result=Algorithms.CalcCrossFlow(flowtest, test1);
-//		System.out.println(result.flowD2R);
-//		selfTest(traffic,outfile);
-//		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
-		int thiscount=0;
+		//对公交信息进行等级划分处理
 		for(TrafficCrossroad cross:traffic.crosses.values()){
-			for(String j:cross.neighbours){
-				if(!traffic.crosses.containsKey(j)){
-					if(j.compareTo(Constants.LIGHT_NONE)!=0){
-						thiscount++;
+			for(int i=0;i<4;i++){
+				if(!traffic.crosses.containsKey(cross.neighbours[i])&&!(cross.neighbours[i].compareTo(Constants.LIGHT_NONE)==0)){
+					int level =1;
+					cross.neighboursLevel[i]=1;
+					String Thiscrossid= cross.id;
+					TrafficCrossroad ThisCross = cross;
+					int thisSide=i;
+					
+					while(Thiscrossid!=Constants.LIGHT_NONE){
+						int otherSide = ThisCross.findOtherSide(thisSide);//3
+						if(traffic.crosses.containsKey((ThisCross.neighbours[otherSide]))){
+							TrafficCrossroad OtherCross = traffic.crosses.get(ThisCross.neighbours[otherSide]);//tl6
+							int fromLight=0;
+							for(int j=0;j<4;j++){
+								if(OtherCross.neighbours[j].compareTo(Thiscrossid)==0){
+									fromLight=j;
+								}
+							}
+							level++;
+							OtherCross.neighboursLevel[fromLight]=level;	
+							thisSide = fromLight;
+							Thiscrossid = OtherCross.id;
+							ThisCross = OtherCross;
+						}else{
+							Thiscrossid = Constants.LIGHT_NONE;
+						}
 					}
 				}
 			}
 		}
-		System.out.println("begin:"+thiscount);
-//		while(!"end".equalsIgnoreCase(flows_str))
-//		{
-//			//TODO  浣犵殑浠ｇ爜,娉ㄦ剰锛屾暟鎹緭鍑洪渶淇濊瘉涓�琛岃緭鍑猴紝闄や簡鏁版嵁缁撴灉锛岃涓嶈灏嗕换浣曟棤鍏虫暟鎹垨寮傚父鎵撳嵃杈撳嚭
-//			System.out.println(Process(flows_str,time,traffic));
-//	        //鑾峰彇涓嬩竴涓椂闂存鐨勬祦閲忋�併�併��
-//			flows_str = br.readLine();
-//			time++;
-//		}
 		
+
+		int time=0;
+//		FileOutputStream outfile = new FileOutputStream(Constants.FILENAME_OUTPUT);
+//		selfTest(traffic,outfile);
+//		System.out.println(traffic.penalty+" "+traffic.Total);
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String flows_str = br.readLine();
+
+		while(!"end".equalsIgnoreCase(flows_str))
+		{
+			//TODO  浣犵殑浠ｇ爜,娉ㄦ剰锛屾暟鎹緭鍑洪渶淇濊瘉涓�琛岃緭鍑猴紝闄や簡鏁版嵁缁撴灉锛岃涓嶈灏嗕换浣曟棤鍏虫暟鎹垨寮傚父鎵撳嵃杈撳嚭
+			System.out.println(Process(flows_str,time,traffic));
+	        //鑾峰彇涓嬩竴涓椂闂存鐨勬祦閲忋�併�併��
+			flows_str = br.readLine();
+			time++;
+		}
+//		
 		
 		//鑷垜娴嬭瘯閮ㄥ垎浠ｇ爜
 	}
