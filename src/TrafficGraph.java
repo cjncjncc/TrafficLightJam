@@ -20,13 +20,11 @@ public class TrafficGraph
 	public int TimeoutTimes;
 	public int flowAway;
 	public int Total;
-<<<<<<< HEAD
 	public List<String> Flowout;
-=======
+
 	public static String [] outLights={"tl53","tl51","tl55","tl54","tl52","tl58","tl56","tl57","tl45","tl47","tl49","tl48","tl13","tl50","tl46"};
 	public List<String> outLightslist;
-	public int Flowout;
->>>>>>> origin/master
+//	public int Flowout;
 	TrafficGraph()
 	{
 		this.crosses = new HashMap<String,TrafficCrossroad>();
@@ -34,15 +32,13 @@ public class TrafficGraph
 		TimeoutTimes=0;
 		flowAway=0;
 		Total=0;
-<<<<<<< HEAD
+
 		Flowout= new ArrayList<String>();
-=======
 		outLightslist = new ArrayList<String>();
 		for(int i=0;i<outLights.length;i++){
 			outLightslist.add(outLights[i]);
 		}
-		Flowout=0;
->>>>>>> origin/master
+//		Flowout=0;
 	}
 	
 	

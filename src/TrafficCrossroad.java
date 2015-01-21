@@ -64,7 +64,7 @@ public class TrafficCrossroad
 	//找到最小的层级
 	public int findHighestLevel(){
 		int j=0;
-<<<<<<< HEAD
+
 		int min=10;
 		for(int i=0;i<4;i++){
 			if(this.neighboursLevel[i]<min){
@@ -72,9 +72,7 @@ public class TrafficCrossroad
 				min = this.neighboursLevel[i];
 			}
 		}
-=======
-		j=(i+2)%4;
->>>>>>> origin/master
+
 		return j;
 	}
 	public int findTriRight(){
