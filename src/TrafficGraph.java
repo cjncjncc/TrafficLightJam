@@ -20,7 +20,13 @@ public class TrafficGraph
 	public int TimeoutTimes;
 	public int flowAway;
 	public int Total;
+<<<<<<< HEAD
 	public List<String> Flowout;
+=======
+	public static String [] outLights={"tl53","tl51","tl55","tl54","tl52","tl58","tl56","tl57","tl45","tl47","tl49","tl48","tl13","tl50","tl46"};
+	public List<String> outLightslist;
+	public int Flowout;
+>>>>>>> origin/master
 	TrafficGraph()
 	{
 		this.crosses = new HashMap<String,TrafficCrossroad>();
@@ -28,7 +34,15 @@ public class TrafficGraph
 		TimeoutTimes=0;
 		flowAway=0;
 		Total=0;
+<<<<<<< HEAD
 		Flowout= new ArrayList<String>();
+=======
+		outLightslist = new ArrayList<String>();
+		for(int i=0;i<outLights.length;i++){
+			outLightslist.add(outLights[i]);
+		}
+		Flowout=0;
+>>>>>>> origin/master
 	}
 	
 	
@@ -469,7 +483,7 @@ public class TrafficGraph
 			int setting = cross.lightSettingHistory[time];
 			
 			CrossFlow cf = Algorithms.CalcCrossFlow(cross.flowHistory.get(time),cross);
-			if ( setting!=3)
+			if ( setting==3)
 			{
 				cf.flowD2L = 0;
 				cf.flowD2U = 0;
@@ -493,8 +507,8 @@ public class TrafficGraph
 					f[i]=0;
 				}
 			}
+			//这里是获得可计算的
 			this.penalty+=Utils.ArraySum(f);
-	
 			
 			if ( cross.neighbours[0].compareTo(Constants.LIGHT_NONE)!=0)
 			{
@@ -503,7 +517,7 @@ public class TrafficGraph
 					CrossFlow lcf = Algorithms.CalcCrossFlow(LeftCross.flowHistory.get(time),LeftCross);
 					
 					int setting2 = LeftCross.lightSettingHistory[time];
-					if ( setting2!=3)
+					if ( setting2==3)
 					{
 						lcf.flowD2L = 0;
 						lcf.flowD2U = 0;
@@ -553,13 +567,12 @@ public class TrafficGraph
 					TrafficCrossroad RightCross =this.crosses.get(cross.neighbours[2]);
 					CrossFlow rightcf = Algorithms.CalcCrossFlow(RightCross.flowHistory.get(time),RightCross);
 					int setting2 = RightCross.lightSettingHistory[time];
-					if ( setting2!=0)
+					if ( setting2==0)
 					{
 						rightcf.flowD2L = 0;
 						rightcf.flowD2U = 0;
 						rightcf.flowU2D = 0;
 						rightcf.flowU2R = 0;
-
 						rightcf.flowL2U = 0;
 						rightcf.flowL2R = 0;
 						rightcf.flowR2L = 0;
@@ -576,7 +589,7 @@ public class TrafficGraph
 					TrafficCrossroad DownCross =this.crosses.get(cross.neighbours[3]);
 					CrossFlow downcf = Algorithms.CalcCrossFlow(DownCross.flowHistory.get(time),DownCross);
 					int setting2 = DownCross.lightSettingHistory[time];
-					if ( setting2!=0)
+					if ( setting2==0)
 					{
 						downcf.flowD2L = 0;
 						downcf.flowD2U = 0;

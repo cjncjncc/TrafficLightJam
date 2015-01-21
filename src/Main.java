@@ -6,6 +6,8 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.rmi.CORBA.Util;
+
 public class Main 
 {
 	/***
@@ -144,7 +146,7 @@ public class Main
 			outputwriter.append("\n");
 //			outfile.write();
 			if(i+1<Constants.MAX_TIME-1){
-				initFlow=traffic.computeNextFlow(i);
+				initFlow=traffic.computeNextFlow2(i);
 			}
 		}
 		outputwriter.flush();
@@ -168,6 +170,7 @@ public class Main
 		reader.close();
 		readerFlow.close();
 		
+<<<<<<< HEAD
 		//对公交信息进行等级划分处理
 		for(TrafficCrossroad cross:traffic.crosses.values()){
 			for(int i=0;i<4;i++){
@@ -196,10 +199,54 @@ public class Main
 						}else{
 							Thiscrossid = Constants.LIGHT_NONE;
 						}
+=======
+		//main process
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		String flows_str = br.readLine();
+		int time=0;
+//		TrafficCrossroad test1=new TrafficCrossroad("test1");
+//		test1.setNeightbours("t1", "t2", "t3", "t4");
+//		int []flowtest= new int[4];
+//		for(int i=0;i<4;i++){
+//			flowtest[i]=20;
+//		}
+//		CrossFlow result=Algorithms.CalcCrossFlow(flowtest, test1);
+//		System.out.println(result.flowD2R);
+		selfTest(traffic,outfile);
+		System.out.println(traffic.penalty+" "+traffic.TimeoutTimes+" "+traffic.flowAway+" "+traffic.Total);
+		int thiscount=0;
+		String outFlight="";
+//		for(TrafficCrossroad cross:traffic.crosses.values()){
+//			for(String j:cross.neighbours){
+//				if(!traffic.crosses.containsKey(j)){
+//					if(j.compareTo(Constants.LIGHT_NONE)!=0){
+//						outFlight+="\""+j+"\",";
+//					}
+//				}
+//			}
+//		}
+		for(TrafficCrossroad cross:traffic.crosses.values()){
+			for(int i=0;i<4;i++){
+				if (traffic.outLightslist.contains(cross.neighbours[i])){
+					for(int j=0;j<cross.flowAdd.length;j++){
+						thiscount+=Utils.ArraySum(cross.flowAdd[j]);
+>>>>>>> origin/master
 					}
 				}
 			}
 		}
+<<<<<<< HEAD
+=======
+		System.out.println(thiscount);
+//		while(!"end".equalsIgnoreCase(flows_str))
+//		{
+//			//TODO  浣犵殑浠ｇ爜,娉ㄦ剰锛屾暟鎹緭鍑洪渶淇濊瘉涓�琛岃緭鍑猴紝闄や簡鏁版嵁缁撴灉锛岃涓嶈灏嗕换浣曟棤鍏虫暟鎹垨寮傚父鎵撳嵃杈撳嚭
+//			System.out.println(Process(flows_str,time,traffic));
+//	        //鑾峰彇涓嬩竴涓椂闂存鐨勬祦閲忋�併�併��
+//			flows_str = br.readLine();
+//			time++;
+//		}
+>>>>>>> origin/master
 		
 
 		int time=0;

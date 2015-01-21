@@ -918,6 +918,10 @@ public class Algorithms
 			traffic.Total+=Utils.ArraySum(m);
 		}
 		
+<<<<<<< HEAD
 		return SolveSingle4(traffic,time);
+=======
+		return SolveSingle2(traffic,time);
+>>>>>>> origin/master
 	}
 }
